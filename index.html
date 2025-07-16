@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Social Boost</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #1f2b3e;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #00d4ff;
+    }
+
+    p {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input, select {
+      background: #eaeaea;
+      color: #000;
+    }
+
+    button {
+      background-color: #00d4ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:disabled {
+      background-color: #555;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loader {
+      margin: 30px auto;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #00d4ff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-message {
+      font-size: 16px;
+      margin-top: 15px;
+    }
+
+    .success {
+      color: #00ff88;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Formulario principal -->
+  <div class="container" id="formSection">
+    <h2>Panel Social Boost</h2>
+    <p>Optimiza tu impacto digital desde un solo lugar</p>
+
+    <select id="platform">
+      <option value="TikTok">TikTok</option>
+      <option value="Instagram">Instagram</option>
+      <option value="Facebook">Facebook</option>
+    </select>
+
+    <input type="text" id="username" placeholder="Nombre de usuario" />
+    <input type="text" id="promoCode" placeholder="Código promocional (opcional)" />
+
+    <button id="generateBtn">Iniciar proceso</button>
+
+    <div id="cooldownMsg" class="status-message"></div>
+  </div>
+
+  <!-- Sección de proceso -->
+  <div class="container hidden" id="processingSection">
+    <h2>Conectando con la red...</h2>
+    <div class="loader"></div>
+    <div id="stepMessage" class="status-message">Verificando usuario...</div>
+  </div>
+
+  <!-- Resultado -->
+  <div class="container hidden" id="resultSection">
+    <h2>Proceso completado</h2>
+    <p class="success" id="resultMessage"></p>
+  </div>
+
+  <script>
+    const btn = document.getElementById('generateBtn');
+    const outputMsg = document.getElementById('cooldownMsg');
+    const usernameInput = document.getElementById('username');
+    const platformSelect = document.getElementById('platform');
+    const promoInput = document.getElementById('promoCode');
+
+    const formSection = document.getElementById('formSection');
+    const processingSection = document.getElementById('processingSection');
+    const resultSection = document.getElementById('resultSection');
+    const stepMessage = document.getElementById('stepMessage');
+    const resultMessage = document.getElementById('resultMessage');
+
+    const WAIT_TIME = 20 * 60 * 1000; // 20 minutos
+    const MAX_FOLLOWERS = 10;
+
+    let lastClick = localStorage.getItem('lastClickTime');
+    let usedAttempts = parseInt(localStorage.getItem('attempts') || '0');
+
+    function updateButtonState() {
+      const now = Date.now();
+      const timeDiff = now - (lastClick || 0);
+
+      const promoCode = localStorage.getItem('promoCode');
+      const maxAttempts = (promoCode === "lunova10") ? 2 : 1;
+
+      if (timeDiff < WAIT_TIME) {
+        if (usedAttempts >= maxAttempts) {
+          btn.disabled = true;
+          let remaining = Math.ceil((WAIT_TIME - timeDiff) / 1000);
+          outputMsg.innerText = `⏳ Espera ${Math.floor(remaining / 60)}m ${remaining % 60}s para volver a intentarlo.`;
+          const interval = setInterval(() => {
+            const newDiff = Date.now() - lastClick;
+            if (newDiff >= WAIT_TIME) {
+              usedAttempts = 0;
+              localStorage.setItem('attempts', '0');
+              btn.disabled = false;
+              outputMsg.innerText = '';
+              clearInterval(interval);
+            } else {
+              let rem = Math.ceil((WAIT_TIME - newDiff) / 1000);
+              outputMsg.innerText = `⏳ Espera ${Math.floor(rem / 60)}m ${rem % 60}s para volver a intentarlo.`;
+            }
+          }, 1000);
+        } else {
+          btn.disabled = false;
+          outputMsg.innerText = `🔄 Intento ${usedAttempts + 1} de ${maxAttempts}`;
+        }
+      } else {
+        usedAttempts = 0;
+        localStorage.setItem('attempts', '0');
+        btn.disabled = false;
+        outputMsg.innerText = '';
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      const username = usernameInput.value.trim();
+      const platform = platformSelect.value;
+      const promoCode = promoInput.value.trim().toLowerCase();
+
+      if (!username) {
+        outputMsg.innerText = "⚠️ Ingresa un nombre de usuario válido.";
+        return;
+      }
+
+      if (promoCode === "lunova10") {
+        localStorage.setItem("promoCode", "lunova10");
+      }
+
+      usedAttempts++;
+      localStorage.setItem('attempts', usedAttempts.toString());
+      lastClick = Date.now();
+      localStorage.setItem('lastClickTime', lastClick.toString());
+
+      // Simulación visual
+      formSection.classList.add('hidden');
+      processingSection.classList.remove('hidden');
+      stepMessage.innerText = `Verificando @${username} en ${platform}...`;
+
+      setTimeout(() => {
+        stepMessage.innerText = `Conectando con la base de datos de ${platform}...`;
+      }, 2000);
+
+      setTimeout(() => {
+        stepMessage.innerText = `Añadiendo seguidores...`;
+      }, 4000);
+
+      setTimeout(() => {
+        processingSection.classList.add('hidden');
+        resultSection.classList.remove('hidden');
+        const added = Math.floor(Math.random() * MAX_FOLLOWERS + 1);
+        resultMessage.innerHTML = `
+          ✅ Se añadieron <strong>${added}</strong> seguidores a <strong>@${username}</strong> en <strong>${platform}</strong>.<br><br>
+          🕓 Los cambios se reflejarán en un periodo estimado de <strong>20 a 40 minutos</strong>.
+        `;
+        updateButtonState();
+      }, 6000);
+    });
+
+    updateButtonState();
+  </script>
+</body>
+</html>
+
+
