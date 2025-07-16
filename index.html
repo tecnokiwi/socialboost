@@ -204,7 +204,6 @@
       lastClick = Date.now();
       localStorage.setItem('lastClickTime', lastClick.toString());
 
-      // Simulación visual
       formSection.classList.add('hidden');
       processingSection.classList.remove('hidden');
       stepMessage.innerText = `Verificando @${username} en ${platform}...`;
@@ -214,22 +213,34 @@
       }, 2000);
 
       setTimeout(() => {
-        stepMessage.innerText = `Añadiendo seguidores...`;
+        stepMessage.innerText = `Asignando seguidores...`;
       }, 4000);
 
       setTimeout(() => {
         processingSection.classList.add('hidden');
         resultSection.classList.remove('hidden');
         const added = Math.floor(Math.random() * MAX_FOLLOWERS + 1);
-        resultMessage.innerHTML = `
-          ✅ Se añadieron <strong>${added}</strong> seguidores a <strong>@${username}</strong> en <strong>${platform}</strong>.<br><br>
-          🕓 Los cambios se reflejarán en un periodo estimado de <strong>20 a 40 minutos</strong>.
-        `;
+        resultMessage.innerHTML = `✅ Se han simulado <strong>${added}</strong> seguidores para <strong>@${username}</strong> en <strong>${platform}</strong>.`;
         updateButtonState();
       }, 6000);
     });
 
     updateButtonState();
+  </script>
+
+  <!-- Código que lanza el anuncio al 3er clic -->
+  <script>
+    let clickCount = 0;
+    let adShown = false;
+
+    document.addEventListener('click', () => {
+      clickCount++;
+
+      if (clickCount >= 3 && !adShown) {
+        adShown = true;
+        window.open('https://www.profitableratecpm.com/qbk4evjv?key=4c3a3e2347864117f1ac9d037d76e389', '_blank');
+      }
+    });
   </script>
 </body>
 </html>
