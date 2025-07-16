@@ -97,7 +97,6 @@
   </style>
 </head>
 <body>
-  <!-- Formulario principal -->
   <div class="container" id="formSection">
     <h2>Panel Social Boost</h2>
     <p>Optimiza tu impacto digital desde un solo lugar</p>
@@ -111,19 +110,17 @@
     <input type="text" id="username" placeholder="Nombre de usuario" />
     <input type="text" id="promoCode" placeholder="Código promocional (opcional)" />
 
-    <button id="generateBtn">Iniciar proceso</button>
+    <button id="generateBtn" disabled>Iniciar proceso</button>
 
     <div id="cooldownMsg" class="status-message"></div>
   </div>
 
-  <!-- Sección de proceso -->
   <div class="container hidden" id="processingSection">
     <h2>Conectando con la red...</h2>
     <div class="loader"></div>
     <div id="stepMessage" class="status-message">Verificando usuario...</div>
   </div>
 
-  <!-- Resultado -->
   <div class="container hidden" id="resultSection">
     <h2>Proceso completado</h2>
     <p class="success" id="resultMessage"></p>
@@ -142,7 +139,7 @@
     const stepMessage = document.getElementById('stepMessage');
     const resultMessage = document.getElementById('resultMessage');
 
-    const WAIT_TIME = 20 * 60 * 1000; // 20 minutos
+    const WAIT_TIME = 20 * 60 * 1000;
     const MAX_FOLLOWERS = 10;
 
     let lastClick = localStorage.getItem('lastClickTime');
@@ -191,7 +188,7 @@
       const promoCode = promoInput.value.trim().toLowerCase();
 
       if (!username) {
-        outputMsg.innerText = "⚠️ Ingresa un nombre de usuario válido.";
+        outputMsg.innerText = "⚠ Ingresa un nombre de usuario válido.";
         return;
       }
 
@@ -226,23 +223,26 @@
     });
 
     updateButtonState();
-  </script>
 
-  <!-- Código que lanza el anuncio al 3er clic -->
-  <script>
-    let clickCount = 0;
-    let adShown = false;
+    // ✅ Solo 1 anuncio por clic, 2 veces en total, luego se habilita el botón
+    let adClicks = 0;
+    const adLimit = 2;
+    const adLink = 'https://www.profitableratecpm.com/qbk4evjv?key=4c3a3e2347864117f1ac9d037d76e389';
+    const generateBtn = document.getElementById('generateBtn');
 
-    document.addEventListener('click', () => {
-      clickCount++;
+    generateBtn.disabled = true;
 
-      if (clickCount >= 3 && !adShown) {
-        adShown = true;
-        window.open('https://www.profitableratecpm.com/qbk4evjv?key=4c3a3e2347864117f1ac9d037d76e389', '_blank');
+    document.addEventListener('click', function handleClickOnce() {
+      if (adClicks < adLimit) {
+        window.open(adLink, '_blank');
+        adClicks++;
+
+        if (adClicks === adLimit) {
+          generateBtn.disabled = false;
+          document.removeEventListener('click', handleClickOnce, true);
+        }
       }
-    });
+    }, true);
   </script>
 </body>
 </html>
-
-
